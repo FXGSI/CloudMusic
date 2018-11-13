@@ -5,20 +5,19 @@
   <router-link to="/" slot="left">
     <mt-button icon="back"></mt-button>
   </router-link>
-
-  <mt-button icon="search" slot="right"></mt-button>
+ <mt-button icon="search" slot="right"></mt-button>
 </mt-header>
     <tabbar></tabbar>
-  
     <!-- 路由显示其他模块 -->
     <router-view></router-view>
+    <player></player>
   </div>
 </template>
 
 <script>
 
- import  tabbar from '../src/components/tabbar/tabbar.vue';
-
+ import  Tabbar from '../src/components/tabbar/tabbar.vue';
+ import Player from 'compon/player/player'
 
 export default {
   name: 'App',
@@ -26,7 +25,8 @@ export default {
     return{}
   } ,
    components: {
-     tabbar
+     Tabbar,
+      Player
    }
 
 }
