@@ -3,14 +3,14 @@
     <div class="player" >
    <transition name="normal">
        <div class="normal-player" v-show="fullScreen" >
-           <!-- v-show="fullScreen" -->
+       
            <!-- @touchstart.once="firstPlay" -->
           <!--设置滤镜 -->
            <!-- <h1>这是播放器</h1> -->
         <div class="background">
              <div class="filter"></div>
-             <img  src="http://p4.music.126.net/xUAfdMHdXhu3BmO4g8nOYA==/109951163573311341.jpg" width="100%" height="100%" alt="">
-             <!-- :src="currentSong.image"  -->
+             <img  :src="currentSong.image" width="100%" height="100%" alt="">
+           
         </div>
         <!-- 头部 标题-->
      <div class="top">
@@ -18,20 +18,20 @@
              
               <i class="fa fa-angle-down"></i>
           </div>
-            <h1 class="title" >花山</h1>
-            <!-- v-html="currentSong.name" -->
-             <h2 class="subtitle" >123</h2>
-             <!-- v-html="currentSong.singer" -->
+            <h1 class="title"  v-html="currentSong.name"></h1>
+          
+             <h2 class="subtitle" v-html="currentSong.singer"></h2>
+             
      </div>
        <div class="middle" >
            <!-- @click="changeMiddle" -->
             <transition name="middleL">
             <div class="middle-l" v-show="currentShow === 'cd'">
               <div class="cd-wrapper">
-                <div class="cd"  >
-                    <!-- :class="cdCls" -->
+                <div class="cd" :class="cdCls" >
+                   
                     <!-- :src="currentSong.image" -->
-                  <img  class="image" src="http://p4.music.126.net/xUAfdMHdXhu3BmO4g8nOYA==/109951163573311341.jpg">
+                  <img  class="image" :src="currentSong.image" >
                 </div>
               </div>
             </div>
@@ -45,11 +45,11 @@
            <!-- 底部播放按钮 -->
     <div class="bottom">
          <div class="progress-wrapper">
-            <span class="time time-l">0.00</span>
+            <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
               <progress-bar :percent="percent" @percentChangeEnd="percentChangeEnd" @percentChange="percentChange"></progress-bar>
             </div>
-          <span class="time time-r">3:59</span>
+          <span class="time time-r">{{format(duration)}}</span>
             </div>
            
   <div class="operators">
@@ -74,30 +74,13 @@
       </div>
     </transition>
 
-
-
-
-
-
-
-    </div>
-
-
-
-
-
-
+<audio id="music-audio" ref="audio" @ended="end" autoplay @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
+</div>
 </template>
-
-
-
-
-
-
-
 <script>
 import ProgressBar from 'base/progress-bar/progress-bar'
 import {mapGetters, mapMutations, mapActions} from 'vuex'
+import {getSong, getLyric} from 'api/song'
 import {playMode} from 'common/js/config'
 
 export default {
@@ -113,7 +96,7 @@ export default {
       currentLyric: null,
       currentLineNum: 0,
       currentShow: 'cd',
-      playingLyric: '',
+     // playingLyric: '',
       noLyric: false
     }
   },
@@ -165,7 +148,7 @@ export default {
       this._getSong(newVal.id)
     },
     url (newUrl) {
-      this._getLyric(this.currentSong.id)
+      //this._getLyric(this.currentSong.id)
       this.$refs.audio.src = newUrl
       // let play = setInterval(() => {
       //   if (this.songReady) {
@@ -191,22 +174,22 @@ export default {
       console.log('firstPlay')
       this.$refs.audio.play()
     },
-    stopMusic () {
-      // 删除最后一首的时候暂停音乐
-      this.$refs.audio.pause()
-      console.log('删除最后一首的时候暂停音乐')
-    },
+    // stopMusic () {
+    //   // 删除最后一首的时候暂停音乐
+    //   this.$refs.audio.pause()
+    //   console.log('删除最后一首的时候暂停音乐')
+    // },
     showPlaylist () {
       this.$refs.playlist.show()
     },
-    changeMiddle () {
-      if (this.currentShow === 'cd') {
-        this.currentShow = 'lyric'
-      } else {
-        this.currentShow = 'cd'
-      }
-      // console.log(this.currentShow)
-    },
+    // changeMiddle () {
+    //   if (this.currentShow === 'cd') {
+    //     this.currentShow = 'lyric'
+    //   } else {
+    //     this.currentShow = 'cd'
+    //   }
+    //   // console.log(this.currentShow)
+    // },
     getFavoriteIcon (song) {
       if (this.isFavorite(song)) {
         return 'icon-like'
@@ -355,35 +338,8 @@ export default {
         this.url = res.data.data[0].url
       })
     },
-    _getLyric (id) {
-      if (this.currentLyric) {
-        this.currentLyric.stop()
-        this.currentLyric = null
-      }
-      this.noLyric = false
-      getLyric(id).then((res) => {
-        this.currentLyric = new Lyric(res.data.lrc.lyric, this.handleLyric)
-        if (this.playing) {
-          this.currentLyric.play()
-          // 歌词重载以后 高亮行设置为 0
-          this.currentLineNum = 0
-          this.$refs.lyricList.scrollTo(0, 0, 1000)
-        }
-      }).catch(() => {
-        this.currentLyric = null
-        this.noLyric = true
-        this.currentLineNum = 0
-      })
-    },
-    handleLyric ({lineNum, txt}) {
-      this.currentLineNum = lineNum
-      if (lineNum > 5) {
-        let lineEl = this.$refs.lyricLine[lineNum - 5]
-        this.$refs.lyricList.scrollToElement(lineEl, 1000)
-      } else {
-        this.$refs.lyricList.scrollTo(0, 0, 1000)
-      }
-    },
+    
+  
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
@@ -399,9 +355,7 @@ export default {
   },
  components: {
     ProgressBar,
-    //ProgressCircle,
-    //Scroll,
-    //Playlist
+    
   }
 
 

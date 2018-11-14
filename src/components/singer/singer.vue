@@ -110,7 +110,7 @@ export default {
 <style lang="scss" scoped>
  .singer {
     position: fixed;
-    top: 200px;
+    top: 85px;
     bottom: 0;
     width: 100%;
  }
